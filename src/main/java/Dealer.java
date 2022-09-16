@@ -2,25 +2,26 @@ public class Dealer {
 
     private static final int PRODUCTION_TIME = 3000;
     private static final int CARS = 10;
-    private static final int WANT_TO_BUY = 5;
-    private static int ProducedCars = 0;
+    private static int producedCars = 0;
+    private static boolean flag = true;
 
-    public synchronized void buyCar() {
-        for (int i = 0; i < WANT_TO_BUY; i++) {
-            if (ProducedCars < 1) {
-                System.out.println("Машин нет");
-                try {
-                    wait();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            } else {
-                ProducedCars--;
-                System.out.printf("%s уехал на новеньком авто\n", Thread.currentThread().getName());
-                Thread.currentThread().stop();
+public synchronized void buyCar() {
+   while (flag){
+        if (producedCars < 1) {
+            System.out.println("Машин нет");
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
+        } else {
+            producedCars--;
+            System.out.printf("%s уехал на новеньком авто\n", Thread.currentThread().getName());
+            flag = false;
         }
     }
+   flag = true;
+}
 
     public void produceCar() {
         for (int i = CARS; i > 0 ; i--) {
@@ -30,7 +31,7 @@ public class Dealer {
                 return;
             }
             System.out.println("Производитель Toyota выпустил 1 авто");
-            ProducedCars++;
+            producedCars++;
             synchronized (this) {
                 notify();
             }
